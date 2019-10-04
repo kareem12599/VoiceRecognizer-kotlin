@@ -13,7 +13,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.lang.Exception
 
 class WeatherRepository(private val context: Context): BaseRepository<WeatherData>() {
     var client: WeatherApi = RetrofitClient.weatherApi
@@ -32,6 +31,7 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
                 )
                 Result.success(response.body())
             } else {
+                getFileFromStorage(context)?:
                 Result.error(response.message(), BaseErrorModel().apply {
                     errorMessage = when (response.code()) {
                         Constants.ERROR_CODE_404 -> context.getString(R.string.data_not_found)
@@ -43,6 +43,7 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
             }
 
         } catch (e: Throwable) {
+            getFileFromStorage(context)?:
             Result.error("failed", BaseErrorModel().apply {
                 errorMessage = context.getString(R.string.network_failure_message)
                 errorTitle = context.getString(R.string.network_failure_error)
@@ -66,18 +67,15 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
         outputStream?.close()
     }
 
-    fun getFileFromStorage(context: Context?): Result<WeatherData, BaseErrorModel> {
+    fun getFileFromStorage(context: Context): Result<WeatherData, BaseErrorModel>? {
         return try {
-            val weatherFile = File(context?.filesDir, Constants.WEATHER_FILE_NAME)
+            val weatherFile = File(context.filesDir, Constants.WEATHER_FILE_NAME)
             val weatherJson = weatherFile.readText()
             val gson = Gson()
             Result.success(gson.fromJson(weatherJson, WeatherData::class.java))
         } catch (e: Exception) {
-            Result.error(" Error", BaseErrorModel().apply {
-                errorMessage = context?.getString(R.string.location_not_available)
-                errorTitle = context?.getString(R.string.default_error_title)
-                errorType = Constants.EMPTY_MEMORY
-            })
+         null
+
         }
     }
 

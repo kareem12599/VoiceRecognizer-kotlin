@@ -52,7 +52,7 @@ class WeatherFragment : Fragment() {
     private lateinit var viewModel: WeatherViewModel
     private lateinit var speech: TextToSpeech
 
-    var mLocationListener: LocationListener = object : LocationListener {
+    private var mLocationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location?) {
             location?.let {
                 mLocation = location
@@ -312,6 +312,12 @@ class WeatherFragment : Fragment() {
     }
 
     private fun displayNotFoundText(errorModel: BaseErrorModel) {
+        when (errorModel.errorType) {
+            Constants.EMPTY_MEMORY -> {
+                errorModel.errorMessage = getString(R.string.location_not_available)
+                errorModel.errorTitle = getString(R.string.default_error_title)
+            }
+        }
         showErrorView(errorModel.errorTitle, errorModel.errorMessage, false)
         val defaultErrorTitle = getString(R.string.default_error_title)
         val defaualtErrorMessage = getString(R.string.default_error_message)
@@ -327,6 +333,7 @@ class WeatherFragment : Fragment() {
         progress.visibility = GONE
         weatherContainer.visibility = GONE
         errorView.visibility = VISIBLE
+
         errorTitleTv.text = errorTitle ?: getString(R.string.default_error_title)
         errorSubtitleTv.text = errorMessage ?: getString(R.string.default_error_message)
         retryButton.visibility = when (b) {
