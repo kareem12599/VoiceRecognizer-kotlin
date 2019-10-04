@@ -15,20 +15,19 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
         return liveData(context = viewModelScope.coroutineContext + Dispatchers.Main) {
             try {
                 emit(Result.loading())
-                if ( location != null &&location.latitude != 0.0 && location.longitude != 0.0) {
-                    val weatherData = repository.getWeatherData(location.latitude, location.longitude)
+                if (location != null && location.latitude != 0.0 && location.longitude != 0.0) {
+                    val weatherData =
+                        repository.getWeatherData(location.latitude, location.longitude)
                     emit(weatherData)
-                }else
+                } else {
                     emit(repository.getFileFromStorage(BaseApplication.baseContext))
+                }
             } catch (ioException: Throwable) {
                 emit(Result.error(ioException.message!!, BaseErrorModel()))
             }
 
         }
     }
-
-
-
 
 
 }

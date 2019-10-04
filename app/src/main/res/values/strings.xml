@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">VoiceRecognizerKotlin</string>
     <string name="hint">Tap on mic to start</string>
+    <string name="network_failure_message">Network failure, Open Wifi or mobile data and retry again</string>
+    <string name="network_failure_error">Network error</string>
+    <string name="location_not_available">Can\'t find location data</string>
+    <string name="default_error_title">Error</string>
+    <string name="data_not_found">data not found</string>
+    <string name="server_error">server is broken</string>
+    <string name="unknown_error">unknown error</string>
+    <string name="sentence_not_recognized_error_message">not understanding your statement, please try a weather sentence.</string>
+    <string name="alert_dialog_title">Location is not enabled</string>
+    <string name="alret_dialog_message">This app required Location to get the weather information. Please grant location permission and reopen the application</string>
+    <string name="default_error_message">Unable to fetch weather data</string>
+    <string name="voice_dialog_message">Hello, How can I help you?</string>
+    <string name="gps_dialog_title">GPS is not enabled</string>
+    <string name="gps_dialog_message">This app required GPS to get the weather information. Do you want to enable GPS?</string>
 </resources>

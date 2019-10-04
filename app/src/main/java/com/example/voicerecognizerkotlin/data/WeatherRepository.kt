@@ -1,6 +1,7 @@
 package com.example.voicerecognizerkotlin.data
 
 import android.content.Context
+import com.example.voicerecognizerkotlin.R
 import com.example.voicerecognizerkotlin.base.BaseRepository
 import com.example.voicerecognizerkotlin.constants.Constants
 import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
@@ -33,9 +34,9 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
             } else {
                 Result.error(response.message(), BaseErrorModel().apply {
                     errorMessage = when (response.code()) {
-                        404 -> " com.example.voicerecognizerkotlin.data not found"
-                        500 -> "server is broken"
-                        else -> "unknown error"
+                        Constants.ERROR_CODE_404 -> context.getString(R.string.data_not_found)
+                        Constants.ERROR_CODE_500 -> context.getString(R.string.server_error)
+                        else -> context.getString(R.string.unknown_error)
                     }
                     serverErrorCode = response.code()
                 })
@@ -43,8 +44,8 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
 
         } catch (e: Throwable) {
             Result.error("failed", BaseErrorModel().apply {
-                errorMessage = "Network failure, Open Wifi or mobile com.example.voicerecognizerkotlin.data and retry again "
-                errorTitle = "Network error"
+                errorMessage = context.getString(R.string.network_failure_message)
+                errorTitle = context.getString(R.string.network_failure_error)
 
             })
         }
@@ -73,8 +74,8 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
             Result.success(gson.fromJson(weatherJson, WeatherData::class.java))
         } catch (e: Exception) {
             Result.error(" Error", BaseErrorModel().apply {
-                errorMessage = "Can't find location com.example.voicerecognizerkotlin.data"
-                errorTitle = "error"
+                errorMessage = context?.getString(R.string.location_not_available)
+                errorTitle = context?.getString(R.string.default_error_title)
                 errorType = Constants.EMPTY_MEMORY
             })
         }
