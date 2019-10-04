@@ -1,8 +1,12 @@
 package com.example.voicerecognizerkotlin.ui
 
 import android.location.Location
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.example.voicerecognizerkotlin.base.BaseApplication
+import com.example.voicerecognizerkotlin.constants.Constants
 import com.example.voicerecognizerkotlin.data.WeatherRepository
 import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
 import com.example.voicerecognizerkotlin.data.model.Result
@@ -20,7 +24,10 @@ class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() 
                         repository.getWeatherData(location.latitude, location.longitude)
                     emit(weatherData)
                 } else {
-                    emit(repository.getFileFromStorage(BaseApplication.baseContext))
+                    repository.getFileFromStorage(BaseApplication.baseContext)?.let { emit(it) }
+                        ?:emit(  Result.error(" Error", BaseErrorModel().apply {
+                            errorType = Constants.EMPTY_MEMORY
+                        }))
                 }
             } catch (ioException: Throwable) {
                 emit(Result.error(ioException.message!!, BaseErrorModel()))
