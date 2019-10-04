@@ -1,9 +1,10 @@
+package com.example.voicerecognizerkotlin.ui
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.voicerecognizerkotlin.R
-import main.WeatherFragment
 
-class MainActivity : AppCompatActivity() {
+class WeatherActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

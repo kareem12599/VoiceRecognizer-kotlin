@@ -1,12 +1,12 @@
-package main
+package com.example.voicerecognizerkotlin.ui
 
 import android.location.Location
 import androidx.lifecycle.*
-import base.BaseApplication
-import data.WeatherRepository
-import data.model.BaseErrorModel
-import data.model.Result
-import data.model.WeatherData
+import com.example.voicerecognizerkotlin.base.BaseApplication
+import com.example.voicerecognizerkotlin.data.WeatherRepository
+import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
+import com.example.voicerecognizerkotlin.data.model.Result
+import com.example.voicerecognizerkotlin.data.model.WeatherData
 import kotlinx.coroutines.Dispatchers
 
 class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {

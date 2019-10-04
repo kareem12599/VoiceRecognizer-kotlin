@@ -1,6 +1,6 @@
-package data.network
+package com.example.voicerecognizerkotlin.data.network
 
-import constants.Constants
+import com.example.voicerecognizerkotlin.constants.Constants
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory

@@ -1,9 +1,9 @@
-package base
+package com.example.voicerecognizerkotlin.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import data.WeatherRepository
-import main.WeatherViewModel
+import com.example.voicerecognizerkotlin.data.WeatherRepository
+import com.example.voicerecognizerkotlin.ui.WeatherViewModel
 
 class ViewModelFactory<M>(private var repository: BaseRepository<M>) : ViewModelProvider.Factory {
 

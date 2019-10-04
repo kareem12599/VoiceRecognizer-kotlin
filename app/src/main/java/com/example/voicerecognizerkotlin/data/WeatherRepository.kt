@@ -1,13 +1,13 @@
-package data
+package com.example.voicerecognizerkotlin.data
 
 import android.content.Context
-import base.BaseRepository
-import constants.Constants
-import data.model.BaseErrorModel
-import data.model.Result
-import data.model.WeatherData
-import data.network.RetrofitClient
-import data.network.WeatherApi
+import com.example.voicerecognizerkotlin.base.BaseRepository
+import com.example.voicerecognizerkotlin.constants.Constants
+import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
+import com.example.voicerecognizerkotlin.data.model.Result
+import com.example.voicerecognizerkotlin.data.model.WeatherData
+import com.example.voicerecognizerkotlin.data.network.RetrofitClient
+import com.example.voicerecognizerkotlin.data.network.WeatherApi
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,7 +33,7 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
             } else {
                 Result.error(response.message(), BaseErrorModel().apply {
                     errorMessage = when (response.code()) {
-                        404 -> " data not found"
+                        404 -> " com.example.voicerecognizerkotlin.data not found"
                         500 -> "server is broken"
                         else -> "unknown error"
                     }
@@ -43,7 +43,7 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
 
         } catch (e: Throwable) {
             Result.error("failed", BaseErrorModel().apply {
-                errorMessage = "Network failure, Open Wifi or mobile data and retry again "
+                errorMessage = "Network failure, Open Wifi or mobile com.example.voicerecognizerkotlin.data and retry again "
                 errorTitle = "Network error"
 
             })
@@ -73,7 +73,7 @@ class WeatherRepository(private val context: Context): BaseRepository<WeatherDat
             Result.success(gson.fromJson(weatherJson, WeatherData::class.java))
         } catch (e: Exception) {
             Result.error(" Error", BaseErrorModel().apply {
-                errorMessage = "Can't find location data"
+                errorMessage = "Can't find location com.example.voicerecognizerkotlin.data"
                 errorTitle = "error"
                 errorType = Constants.EMPTY_MEMORY
             })

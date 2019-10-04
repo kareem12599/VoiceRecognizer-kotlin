@@ -1,6 +1,6 @@
-package data.network
+package com.example.voicerecognizerkotlin.data.network
 
-import data.model.WeatherData
+import com.example.voicerecognizerkotlin.data.model.WeatherData
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

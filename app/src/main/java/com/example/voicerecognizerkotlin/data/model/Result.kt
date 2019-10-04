@@ -1,4 +1,4 @@
-package data.model
+package com.example.voicerecognizerkotlin.data.model
 
 enum class Status { SUCCESS, ERROR, LOADING }
 

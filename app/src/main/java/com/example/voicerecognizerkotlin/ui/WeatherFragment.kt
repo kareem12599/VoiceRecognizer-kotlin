@@ -1,4 +1,4 @@
-package main
+package com.example.voicerecognizerkotlin.ui
 
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
@@ -27,11 +27,12 @@ import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.example.voicerecognizerkotlin.R
-import base.ViewModelFactory
-import constants.Constants
-import data.model.BaseErrorModel
-import data.model.WeatherData
-import utils.InjectionUtils
+import com.example.voicerecognizerkotlin.base.ViewModelFactory
+import com.example.voicerecognizerkotlin.constants.Constants
+import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
+import com.example.voicerecognizerkotlin.data.model.Status
+import com.example.voicerecognizerkotlin.data.model.WeatherData
+import com.example.voicerecognizerkotlin.utils.InjectionUtils
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.layout_error_view.*
@@ -226,8 +227,8 @@ class WeatherFragment : Fragment() {
                                 viewModel.refresh(it)
                                     .observe(this@WeatherFragment, Observer { data ->
                                         when {
-                                            data.status == data.model.Status.LOADING -> showProgress()
-                                            data.status == data.model.Status.SUCCESS -> updateView(data.response)
+                                            data.status == Status.LOADING -> showProgress()
+                                            data.status == Status.SUCCESS -> updateView(data.response)
                                             else -> {
                                                 if (!requestedPermissionGranted && checkAndAskForLocationPermissions() && data.errorModel?.errorType != Constants.EMPTY_MEMORY)
                                                     checkGpsEnabledAndPrompt()
@@ -238,7 +239,7 @@ class WeatherFragment : Fragment() {
 
                                     })
                             }
-                            else -> displayNotFoundText(data.model.BaseErrorModel().apply {
+                            else -> displayNotFoundText(BaseErrorModel().apply {
                                 errorMessage =
                                     "not understanding your statement, please try a weather sentence."
                             })
@@ -309,9 +310,9 @@ class WeatherFragment : Fragment() {
     private fun displayNotFoundText(errorModel: BaseErrorModel) {
         showErrorView(errorModel.errorTitle, errorModel.errorMessage, false)
         val defaultErrorTitle = "Error"
-        val defaualtErrorMessage = "Unable to fetch data "
+        val defaualtErrorMessage = "Unable to fetch com.example.voicerecognizerkotlin.data "
         speech.speak("${errorModel.errorTitle?.let { it }
-            ?: defaultErrorTitle}  unable to fetch data because of ${errorModel.errorMessage?.let { it }
+            ?: defaultErrorTitle}  unable to fetch com.example.voicerecognizerkotlin.data because of ${errorModel.errorMessage?.let { it }
             ?: defaualtErrorMessage}",
             TextToSpeech.QUEUE_FLUSH, null, ""
         )
@@ -323,7 +324,7 @@ class WeatherFragment : Fragment() {
         weatherContainer.visibility = GONE
         errorView.visibility = VISIBLE
         errorTitleTv.text = errorTitle ?: "Error"
-        errorSubtitleTv.text = errorMessage ?: "Unable to fetch data "
+        errorSubtitleTv.text = errorMessage ?: "Unable to fetch com.example.voicerecognizerkotlin.data "
         retryButton.visibility = when (b) {
             true -> VISIBLE
             else -> GONE
