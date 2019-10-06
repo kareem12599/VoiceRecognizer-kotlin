@@ -12,8 +12,9 @@ import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
 import com.example.voicerecognizerkotlin.data.model.Result
 import com.example.voicerecognizerkotlin.data.model.WeatherData
 import kotlinx.coroutines.Dispatchers
+import javax.inject.Inject
 
-class WeatherViewModel(private val repository: WeatherRepository) : ViewModel() {
+class WeatherViewModel @Inject constructor(private val repository: WeatherRepository) : ViewModel() {
 
     fun refresh(location: Location?): LiveData<Result<WeatherData, BaseErrorModel>> {
         return liveData(context = viewModelScope.coroutineContext + Dispatchers.Main) {

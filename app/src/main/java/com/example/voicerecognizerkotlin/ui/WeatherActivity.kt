@@ -1,8 +1,12 @@
 package com.example.voicerecognizerkotlin.ui
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.voicerecognizerkotlin.DaggerWeatherComponent
 import com.example.voicerecognizerkotlin.R
+import com.example.voicerecognizerkotlin.WeatherComponent
+import com.example.voicerecognizerkotlin.WeatherModule
 
 class WeatherActivity : AppCompatActivity() {
 
@@ -15,5 +19,7 @@ class WeatherActivity : AppCompatActivity() {
                 .commitNow()
         }
     }
+
+
 
 }

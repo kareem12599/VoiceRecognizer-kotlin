@@ -13,8 +13,10 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.lang.Exception
+import javax.inject.Inject
 
-class WeatherRepository(private val context: Context): BaseRepository<WeatherData>() {
+class WeatherRepository @Inject constructor(private val context: Context): BaseRepository<WeatherData>() {
     var client: WeatherApi = RetrofitClient.weatherApi
     suspend fun getWeatherData(
         latitude: Double,
