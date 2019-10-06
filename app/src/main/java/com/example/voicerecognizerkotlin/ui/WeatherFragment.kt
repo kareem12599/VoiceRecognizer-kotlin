@@ -92,7 +92,7 @@ class WeatherFragment : Fragment() {
 
         viewModel = ViewModelProviders.of(
             this,
-            ViewModelFactory(InjectionUtils.injectWeatherRepository(requireContext()))
+            ViewModelFactory<WeatherData>(requireContext())
         )
             .get(WeatherViewModel::class.java).apply {
 
