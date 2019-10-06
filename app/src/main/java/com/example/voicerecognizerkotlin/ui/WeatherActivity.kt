@@ -18,7 +18,6 @@ class WeatherActivity : AppCompatActivity() {
                 .replace(R.id.container, WeatherFragment.newInstance())
                 .commitNow()
         }
-     //   createWeatherComponent(this)
     }
 
 
