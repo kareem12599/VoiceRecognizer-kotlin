@@ -15,7 +15,7 @@ import java.io.File
 import java.lang.Exception
 import javax.inject.Inject
 
-class WeatherRepository @Inject constructor(private val context: Context): BaseRepository<WeatherData>() {
+class WeatherRepository(private val context: Context): BaseRepository<WeatherData>() {
     var client: WeatherApi = RetrofitClient.weatherApi
     suspend fun getWeatherData(
         latitude: Double,
@@ -32,20 +32,22 @@ class WeatherRepository @Inject constructor(private val context: Context): BaseR
                 )
                 Result.success(response.body())
             } else {
+                getFileFromStorage(context)?:
                 Result.error(response.message(), BaseErrorModel().apply {
                     errorMessage = when (response.code()) {
-                        404 -> " com.example.voicerecognizerkotlin.data not found"
-                        500 -> "server is broken"
-                        else -> "unknown error"
+                        Constants.ERROR_CODE_404 -> context.getString(R.string.data_not_found)
+                        Constants.ERROR_CODE_500 -> context.getString(R.string.server_error)
+                        else -> context.getString(R.string.unknown_error)
                     }
                     serverErrorCode = response.code()
                 })
             }
 
         } catch (e: Throwable) {
+            getFileFromStorage(context)?:
             Result.error("failed", BaseErrorModel().apply {
-                errorMessage = "Network failure, Open Wifi or mobile com.example.voicerecognizerkotlin.data and retry again "
-                errorTitle = "Network error"
+                errorMessage = context.getString(R.string.network_failure_message)
+                errorTitle = context.getString(R.string.network_failure_error)
 
             })
         }
@@ -66,18 +68,15 @@ class WeatherRepository @Inject constructor(private val context: Context): BaseR
         outputStream?.close()
     }
 
-    fun getFileFromStorage(context: Context?): Result<WeatherData, BaseErrorModel> {
+    fun getFileFromStorage(context: Context): Result<WeatherData, BaseErrorModel>? {
         return try {
-            val weatherFile = File(context?.filesDir, Constants.WEATHER_FILE_NAME)
+            val weatherFile = File(context.filesDir, Constants.WEATHER_FILE_NAME)
             val weatherJson = weatherFile.readText()
             val gson = Gson()
             Result.success(gson.fromJson(weatherJson, WeatherData::class.java))
         } catch (e: Exception) {
-            Result.error(" Error", BaseErrorModel().apply {
-                errorMessage = "Can't find location com.example.voicerecognizerkotlin.data"
-                errorTitle = "error"
-                errorType = Constants.EMPTY_MEMORY
-            })
+         null
+
         }
     }
 

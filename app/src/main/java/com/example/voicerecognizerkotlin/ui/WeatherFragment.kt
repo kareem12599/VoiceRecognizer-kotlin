@@ -4,27 +4,25 @@ import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import com.example.voicerecognizerkotlin.R
 import com.example.voicerecognizerkotlin.base.ViewModelFactory
@@ -51,8 +49,10 @@ class WeatherFragment : Fragment() {
     private lateinit var mLocationManager: LocationManager
     private var mLocation: Location? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var viewModel: WeatherViewModel
+    private lateinit var speech: TextToSpeech
 
-    var mLocationListener: LocationListener = object : LocationListener {
+    private var mLocationListener: LocationListener = object : LocationListener {
         override fun onLocationChanged(location: Location?) {
             location?.let {
                 mLocation = location
@@ -76,8 +76,6 @@ class WeatherFragment : Fragment() {
         fun newInstance() = WeatherFragment()
     }
 
-    private lateinit var viewModel: WeatherViewModel
-    private lateinit var speech: TextToSpeech
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -127,8 +125,8 @@ class WeatherFragment : Fragment() {
         if (!isLocationEnabled) {
             AlertDialog.Builder(requireContext())
                 .setCancelable(false)
-                .setTitle("GPS is not enabled")
-                .setMessage("This app required GPS to get the weather information. Do you want to enable GPS?")
+                .setTitle(getString(R.string.gps_dialog_title))
+                .setMessage(getString(R.string.gps_dialog_message))
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                     startActivityForResult(intent, RC_ENABLE_LOCATION)
@@ -189,7 +187,6 @@ class WeatherFragment : Fragment() {
                     checkGpsEnabledAndPrompt()
                     requestedPermissionGranted = true
                 } else {
-                    Toast.makeText(context, "Permission deneied ", Toast.LENGTH_SHORT).show()
                     requestedPermissionGranted = false
                     showAlertDialog()
 
@@ -206,7 +203,7 @@ class WeatherFragment : Fragment() {
             RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
         )
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Hello, How can I help you?")
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.voice_dialog_message))
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT)
         } catch (a: ActivityNotFoundException) {
@@ -221,40 +218,49 @@ class WeatherFragment : Fragment() {
             REQ_CODE_SPEECH_INPUT -> {
                 if (resultCode == RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    with(result[0]) {
-                        when {
-                            contains("weather") || contains("show weather") -> mLocation.let {
-                                viewModel.refresh(it)
-                                    .observe(this@WeatherFragment, Observer { data ->
-                                        when {
-                                            data.status == Status.LOADING -> showProgress()
-                                            data.status == Status.SUCCESS -> updateView(data.response)
-                                            else -> {
-                                                if (!requestedPermissionGranted && checkAndAskForLocationPermissions() && data.errorModel?.errorType != Constants.EMPTY_MEMORY)
-                                                    checkGpsEnabledAndPrompt()
-                                                else
-                                                    displayNotFoundText(data.errorModel as BaseErrorModel)
-                                            }
-                                        }
-
-                                    })
-                            }
-                            else -> displayNotFoundText(BaseErrorModel().apply {
-                                errorMessage =
-                                    "not understanding your statement, please try a weather sentence."
-                            })
-                        }
-                    }
+                    processVoiceOutput(result)
                 }
             }
+        }
+    }
+
+    private fun processVoiceOutput(result: ArrayList<String>) {
+        with(result[0]) {
+            when {
+                contains("weather") || contains("show weather") -> refreshWeatherData()
+                else -> displayNotFoundText(BaseErrorModel().apply {
+                    errorMessage =
+                        getString(R.string.sentence_not_recognized_error_message)
+                })
+            }
+        }
+
+    }
+
+    private fun refreshWeatherData() {
+        mLocation.let {
+            viewModel.refresh(it)
+                .observe(this@WeatherFragment, Observer { data ->
+                    when {
+                        data.status == Status.LOADING -> showProgress()
+                        data.status == Status.SUCCESS -> updateView(data.response)
+                        else -> {
+                            if (!requestedPermissionGranted && checkAndAskForLocationPermissions() && data.errorModel?.errorType != Constants.EMPTY_MEMORY)
+                                checkGpsEnabledAndPrompt()
+                            else
+                                displayNotFoundText(data.errorModel as BaseErrorModel)
+                        }
+                    }
+
+                })
         }
     }
 
     private fun showAlertDialog() {
         AlertDialog.Builder(requireContext())
             .setCancelable(false)
-            .setTitle("Location is not enabled")
-            .setMessage("This app required Location to get the weather information. Please grant location permission and reopen the application ")
+            .setTitle(getString(R.string.alert_dialog_title))
+            .setMessage(getString(R.string.alret_dialog_message))
             .setPositiveButton(android.R.string.ok) { dialog, _ ->
                 dialog.dismiss()
                 lifecycleScope.launch {
@@ -263,7 +269,7 @@ class WeatherFragment : Fragment() {
                 }
             }.show()
         speech.speak(
-            "This app required Location to get the weather information. Please grant location permission and reopen the application ",
+            getString(R.string.alret_dialog_message),
             TextToSpeech.QUEUE_FLUSH, null, ""
         )
 
@@ -275,7 +281,6 @@ class WeatherFragment : Fragment() {
         progress.visibility = VISIBLE
         weatherContainer.visibility = GONE
         errorView.visibility = GONE
-        Toast.makeText(context, "progress", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -283,7 +288,6 @@ class WeatherFragment : Fragment() {
         progress.visibility = GONE
         weatherContainer.visibility = VISIBLE
         errorView.visibility = GONE
-        Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
         if (data != null) {
             val statement = weatherToText(data)
             speech.speak(statement, TextToSpeech.QUEUE_FLUSH, null, "")
@@ -308,11 +312,17 @@ class WeatherFragment : Fragment() {
     }
 
     private fun displayNotFoundText(errorModel: BaseErrorModel) {
+        when (errorModel.errorType) {
+            Constants.EMPTY_MEMORY -> {
+                errorModel.errorMessage = getString(R.string.location_not_available)
+                errorModel.errorTitle = getString(R.string.default_error_title)
+            }
+        }
         showErrorView(errorModel.errorTitle, errorModel.errorMessage, false)
-        val defaultErrorTitle = "Error"
-        val defaualtErrorMessage = "Unable to fetch com.example.voicerecognizerkotlin.data "
+        val defaultErrorTitle = getString(R.string.default_error_title)
+        val defaualtErrorMessage = getString(R.string.default_error_message)
         speech.speak("${errorModel.errorTitle?.let { it }
-            ?: defaultErrorTitle}  unable to fetch com.example.voicerecognizerkotlin.data because of ${errorModel.errorMessage?.let { it }
+            ?: defaultErrorTitle}  unable to fetch data because of ${errorModel.errorMessage?.let { it }
             ?: defaualtErrorMessage}",
             TextToSpeech.QUEUE_FLUSH, null, ""
         )
@@ -323,8 +333,9 @@ class WeatherFragment : Fragment() {
         progress.visibility = GONE
         weatherContainer.visibility = GONE
         errorView.visibility = VISIBLE
-        errorTitleTv.text = errorTitle ?: "Error"
-        errorSubtitleTv.text = errorMessage ?: "Unable to fetch com.example.voicerecognizerkotlin.data "
+
+        errorTitleTv.text = errorTitle ?: getString(R.string.default_error_title)
+        errorSubtitleTv.text = errorMessage ?: getString(R.string.default_error_message)
         retryButton.visibility = when (b) {
             true -> VISIBLE
             else -> GONE
@@ -343,10 +354,8 @@ class WeatherFragment : Fragment() {
 
 
     override fun onStop() {
-        if (speech != null) {
-            speech.stop()
-            speech.shutdown()
-        }
+        speech.stop()
+        speech.shutdown()
         super.onStop()
     }
 }
