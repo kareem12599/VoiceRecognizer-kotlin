@@ -1,6 +1,7 @@
 package com.example.voicerecognizerkotlin.data
 
 import android.content.Context
+import com.example.voicerecognizerkotlin.R
 import com.example.voicerecognizerkotlin.base.BaseRepository
 import com.example.voicerecognizerkotlin.constants.Constants
 import com.example.voicerecognizerkotlin.data.model.BaseErrorModel
@@ -15,7 +16,7 @@ import java.io.File
 import java.lang.Exception
 import javax.inject.Inject
 
-class WeatherRepository(private val context: Context): BaseRepository<WeatherData>() {
+class WeatherRepository @Inject constructor(private val context: Context): BaseRepository<WeatherData>() {
     var client: WeatherApi = RetrofitClient.weatherApi
     suspend fun getWeatherData(
         latitude: Double,
